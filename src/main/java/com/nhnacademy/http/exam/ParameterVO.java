@@ -11,5 +11,4 @@ public class ParameterVO {
     private String accept;
     private String requestHeaderOfFirst;
 
-
 }
