@@ -1,105 +1,32 @@
 package com.nhnacademy.http.exam;
 
-import java.util.HashMap;
 import java.util.Map;
 
-public class RequestVO {
-    private String method;
-    private String path;
-    private String scheme;
+public interface RequestVO {
 
-    private Map<String, String> header = new HashMap<>();
+    void setOrigin(String hostAddress);
 
-    private String domain;
-    private String ip;
-    private String agent;
-    private String accept;
-    private String requestHeaderOfFirst;
+    String getScheme();
 
-    public String getMethod() {
-        return method;
-    }
+    String getHost();
 
-    public void setMethod(String method) {
-        this.method = method;
-    }
+    String getPath();
 
-    public String getPath() {
-        return path;
-    }
+    void setUrl(String s);
 
-    public void setPath(String path) {
-        this.path = path;
-    }
+    String getOrigin();
 
-    public String getScheme() {
-        return scheme;
-    }
+    void setPath(String s);
 
-    public void setScheme(String scheme) {
-        this.scheme = scheme;
-    }
+    void setScheme(String s);
 
-    public Map<String, String> getHeader() {
-        return header;
-    }
+    void setHeader(Map<String, String> header);
 
-    public void setHeader(Map<String, String> header) {
-        this.header = header;
-    }
+    void setHost(String s);
 
-    public String getDomain() {
-        return domain;
-    }
+    void setArgs(Map<String, String> map);
 
-    public void setDomain(String domain) {
-        this.domain = domain;
-    }
+    void setData(String metaDatum);
 
-    public String getIp() {
-        return ip;
-    }
-
-    public void setIp(String ip) {
-        this.ip = ip;
-    }
-
-    public String getAgent() {
-        return agent;
-    }
-
-    public void setAgent(String agent) {
-        this.agent = agent;
-    }
-
-    public String getAccept() {
-        return accept;
-    }
-
-    public void setAccept(String accept) {
-        this.accept = accept;
-    }
-
-    public String getRequestHeaderOfFirst() {
-        return requestHeaderOfFirst;
-    }
-
-    public void setRequestHeaderOfFirst(String requestHeaderOfFirst) {
-        this.requestHeaderOfFirst = requestHeaderOfFirst;
-    }
-
-    @Override
-    public String toString() {
-        return "RequestVO{" +
-            "method='" + method + '\'' +
-            ", path='" + path + '\'' +
-            ", scheme='" + scheme + '\'' +
-            ", header=" + header +
-            ", domain='" + domain + '\'' +
-            ", ip='" + ip + '\'' +
-            ", agent='" + agent + '\'' +
-            ", accept='" + accept + '\'' +
-            ", requestHeaderOfFirst='" + requestHeaderOfFirst + '\'' +
-            '}';
-    }
+    void setJson(Map<String, String> map);
 }

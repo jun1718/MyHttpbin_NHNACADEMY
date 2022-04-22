@@ -1,18 +1,18 @@
 package com.nhnacademy.http.exam;
 
+import static java.lang.System.lineSeparator;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
-import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
-import jdk.swing.interop.SwingInterOpUtils;
 
 public class Sender {
-
     private DataOutputStream out;
     private StringBuilder responseData = new StringBuilder();
 
@@ -25,37 +25,56 @@ public class Sender {
         }
     }
 
-    public void sendResponse()  {
+    public void sendResponse(RequestVO requestData)  {
+        ObjectMapper objectMapper = new ObjectMapper();
+        String json = null;
 
         try {
-            String str = "{\n" +
-                "  \"args\": {},\n" +
-                "  \"headers\": {\n" +
-                "    \"Accept\": \"*/*\",\n" +
-                "    \"Host\": \"httpbin.org\",\n" +
-                "    \"User-Agent\": \"curl/7.79.1\",\n" +
-                "    \"X-Amzn-Trace-Id\": \"Root=1-62622c9a-3158e02112f81c8261f7aa7e\"\n" +
-                "  },\n" +
-                "  \"origin\": \"112.216.11.34\",\n" +
-                "  \"url\": \"http://httpbin.org/get\"\n" +
-                "}" + System.lineSeparator();
+            if (requestData.getPath().equals("/ip")) {
+                String ip = requestData.getOrigin().split("\n")[0];
+                json = "{\n" + "\t\"origin\" : " + ip + "\n}" + lineSeparator();
+            } else if (requestData.getPath().contains("/get")) {
+                json = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(requestData) + lineSeparator();
+            } else if (requestData.getPath().contains("/post")) {
+                System.out.println("나옴?");
+                json = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(requestData) + lineSeparator();
 
+                System.out.println(requestData);
+                System.out.println(json);
+            } else {
+                json = "";
+            }
 
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
+        int len = json.getBytes().length;
 
-            responseData.append("HTTP/1.1 200 OK" + System.lineSeparator())
-                    .append(getDate() + System.lineSeparator())
-                        .append("Content-Type: application/json" + System.lineSeparator())
-                            .append("Content-Length: " + str.getBytes().length + System.lineSeparator())
-                                .append("Connection: keep-alive" + System.lineSeparator())
-                                    .append("Server: gunicorn/19.9.0" + System.lineSeparator())
-                                        .append("Access-Control-Allow-Origin: *" + System.lineSeparator())
-                                            .append("Access-Control-Allow-Credentials: true" + System.lineSeparator() + System.lineSeparator())
-                                                .append(str);
+        try {
+            responseData.append("HTTP/1.1 200 OK" + lineSeparator())
+                    .append(getDate() + lineSeparator())
+                        .append("Content-Type: application/json" + lineSeparator())
+                            .append("Content-Length: " + len + lineSeparator())
+                                .append("Connection: keep-alive" + lineSeparator())
+                                    .append("Server: 11Jo" + lineSeparator())
+                                        .append("Access-Control-Allow-Origin: *" + lineSeparator())
+                                            .append("Access-Control-Allow-Credentials: true" + lineSeparator() + lineSeparator())
+                                                .append(json);
             out.writeBytes(responseData.toString());
         } catch (IOException e) {
             e = new IOException("상대방에게 메시지를 보내지 못했습니다. : sendData()");
             e.printStackTrace();
+
+            responseData.setLength(0);
+            responseData.append("HTTP/1.1 404 NOTFOUND");
+            try {
+                out.writeBytes(responseData.toString());
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
         }
     }
 
