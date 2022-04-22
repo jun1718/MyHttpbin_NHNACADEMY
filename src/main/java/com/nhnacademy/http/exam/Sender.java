@@ -4,9 +4,15 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Date;
+import java.util.Locale;
+import java.util.TimeZone;
+import jdk.swing.interop.SwingInterOpUtils;
 
 public class Sender {
+
     private DataOutputStream out;
     private StringBuilder responseData = new StringBuilder();
 
@@ -20,6 +26,7 @@ public class Sender {
     }
 
     public void sendResponse()  {
+
         try {
             String str = "{\n" +
                 "  \"args\": {},\n" +
@@ -34,8 +41,10 @@ public class Sender {
                 "}" + System.lineSeparator();
 
 
+
+
             responseData.append("HTTP/1.1 200 OK" + System.lineSeparator())
-                    .append("Date: Fri, 22 Apr 2022 04:18:34 GMT" + System.lineSeparator())
+                    .append(getDate() + System.lineSeparator())
                         .append("Content-Type: application/json" + System.lineSeparator())
                             .append("Content-Length: " + str.getBytes().length + System.lineSeparator())
                                 .append("Connection: keep-alive" + System.lineSeparator())
@@ -48,5 +57,14 @@ public class Sender {
             e = new IOException("상대방에게 메시지를 보내지 못했습니다. : sendData()");
             e.printStackTrace();
         }
+    }
+
+    private String getDate() {
+        Date currentTime = new Date();
+        SimpleDateFormat dateFormat =
+            new SimpleDateFormat("EEE, d MMM yyyy hh:mm:ss z", Locale.ENGLISH);
+
+        dateFormat.setTimeZone(TimeZone.getTimeZone("Asia/Seoul"));
+        return dateFormat.format(currentTime);
     }
 }

@@ -11,10 +11,13 @@ public class Connector implements Runnable {
 
     @Override
     public void run() {
-        Receiver receiver = new Receiver(socket);
+        RequestVO requestData = new RequestVO();
+
+        Receiver receiver = new Receiver(socket, requestData);
         Sender sender = new Sender(socket);
 
         receiver.receiveRequest();
         sender.sendResponse();
     }
+
 }
