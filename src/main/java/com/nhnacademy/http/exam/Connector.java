@@ -7,7 +7,6 @@ public class Connector implements Runnable {
     private final Socket socket;
     private RequestVO requestData;
 
-
     public Connector(Socket socket) {
         this.socket = socket;
     }

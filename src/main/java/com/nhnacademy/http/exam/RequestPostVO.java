@@ -7,14 +7,19 @@ import java.util.Map;
 public class RequestPostVO implements RequestVO {
     private Map<String, String> args = Collections.emptyMap();
     private String data = "";
-    private Map<String, String> files = Collections.emptyMap();
+    private Map<String, Map<String, String>> files = Collections.emptyMap();
     private Map<String, String> form = Collections.emptyMap();
     private Map<String, String> header = Collections.emptyMap();
     private Map<String, String> json = Collections.emptyMap();
     private String origin;
     private String url;
 
-    public Map<String, String> getFiles() {
+    public void setFiles(
+        Map<String, Map<String, String>> files) {
+        this.files = files;
+    }
+
+    public Map<String, Map<String, String>> getFiles() {
         return files;
     }
 

@@ -12,6 +12,7 @@ public class Parser {
     private String[] metaData;
     private String[] metaDataHeader;
     private String metaDataBody;
+    private String contentType;
 
 
     public Parser(RequestVO requestVO, String requestData) {
@@ -20,7 +21,10 @@ public class Parser {
 
         metaData = requestData.split(System.lineSeparator() + System.lineSeparator());
         metaDataHeader = metaData[0].split(System.lineSeparator());
-        metaDataBody = metaData[1];
+
+        if (metaDataHeader[0].split(" ")[0].equals("POST")) {
+            metaDataBody = metaData[1];
+        }
     }
 
     public void parse() {
@@ -67,19 +71,39 @@ public class Parser {
     }
 
     private void bodyParse() {
+        setContentType();
         RequestPostVO post = (RequestPostVO) requestVO;
-        post.setData(metaDataBody);
-
         ObjectMapper mapper = new ObjectMapper();
-
         TypeReference<HashMap<String, String>> typeRef
             = new TypeReference<HashMap<String, String>>() {};
 
-        try {
-            Map<String, String> map = mapper.readValue(metaDataBody, typeRef);
-            post.setJson(map);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
+        if (contentType.equals("application/json")) {
+            post.setData(metaDataBody);
+
+            try {
+                Map<String, String> map = mapper.readValue(metaDataBody, typeRef);
+                post.setJson(map);
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+            }
+        } else if (contentType.equals("multipart/form-data")) {
+            Map<String, Map<String, String>> files = new HashMap<>();
+            String str = "{ \"msg1\": \"hello\", \"msg2\": \"world\" }";
+            try {
+                files.put("upload", mapper.readValue(str, typeRef));
+                post.setFiles(files);
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void setContentType() {
+        for (int i = 0; i < metaDataHeader.length; i++) {
+            if (metaDataHeader[i].contains("Content-Type")) {
+                contentType = metaDataHeader[i].split("; ")[0];
+                contentType = contentType.split(": ")[1];
+            }
         }
     }
 }

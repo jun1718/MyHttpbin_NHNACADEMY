@@ -36,7 +36,6 @@ public class Sender {
             } else if (requestData.getPath().contains("/get")) {
                 json = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(requestData) + lineSeparator();
             } else if (requestData.getPath().contains("/post")) {
-                System.out.println("나옴?");
                 json = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(requestData) + lineSeparator();
 
                 System.out.println(requestData);
