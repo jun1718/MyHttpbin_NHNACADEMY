@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -20,21 +21,23 @@ public class Parser {
     public Parser(RequestVO requestVO, String requestData) {
         this.requestVO = requestVO;
 
-        metaData = requestData.split(System.lineSeparator() + System.lineSeparator());
-        metaDataHeader = metaData[0].split(System.lineSeparator());
+        metaData = requestData.split("\r\n\r\n");
+        metaDataHeader = metaData[0].split("\r\n");
 
         setContentType();
         if (!boundary.isEmpty() && metaData.length >= 2) {
-            metaData = requestData.split(boundary + System.lineSeparator() + System.lineSeparator());
+            metaData = requestData.split(boundary + "\r\n\r\n");
         }
 
         this.method = metaDataHeader[0].split(" ")[0];
+
+
         if (this.method.equals("POST")) {
             metaDataBody = metaData[1];
         }
     }
 
-    public void parse() { // FIXME: url까지 헤더파서에서 다 집어넣도록하자
+    public void parse() {
         headerParse();
 
         if (this.method.equals("POST")) {
@@ -62,7 +65,7 @@ public class Parser {
         String[] startLine = metaDataHeader[0].split(" ");
         requestVO.setPath(startLine[1]);
         requestVO.setScheme(startLine[2].split("/")[0]);
-        Map<String, String> map = new HashMap<>();
+        Map<String, String> map = new LinkedHashMap<>();
 
         if (requestVO.getPath().contains("?")) {
             String[] parameters = startLine[1].split("\\?");
@@ -80,8 +83,8 @@ public class Parser {
     private void bodyParse() {
         RequestPostVO post = (RequestPostVO) requestVO;
         ObjectMapper mapper = new ObjectMapper();
-        TypeReference<HashMap<String, String>> typeRef
-            = new TypeReference<HashMap<String, String>>() {};
+        TypeReference<LinkedHashMap<String, String>> typeRef
+            = new TypeReference<LinkedHashMap<String, String>>() {};
 
         if (contentType.equals("application/json")) {
             post.setData(metaDataBody);
@@ -94,18 +97,13 @@ public class Parser {
             }
         } else if (contentType.equals("multipart/form-data")) {
             Map<String, String> filesMap = new HashMap<String, String>();
-
-            System.out.println(metaDataBody);
-
-            String[] files = metaDataBody.split( "--" + boundary + System.lineSeparator());
-
+            String[] files = metaDataBody.split( "--" + boundary + "\r\n");
 
             for (String file : files) {
-                String[] total = file.split(System.lineSeparator() + System.lineSeparator());
+                String[] total = file.split("\r\n\r\n");
                 String header = total[0];
-                String[] headers = header.split(System.lineSeparator());
+                String[] headers = header.split("\r\n");
 
-                System.out.println(Arrays.toString(headers));
                 if (total.length <= 1) {
                     continue;
                 }
@@ -120,18 +118,16 @@ public class Parser {
                             .filter(a -> a.contains("name"))
                             .collect(Collectors.toList()).get(0).split("=\"")[1].replace("\";", "");
 
-                        String lastBoundary = "--" + boundary + "--" + System.lineSeparator();
+                        String lastBoundary = "--" + boundary + "--" + "\r\n";
                         if (body.contains(lastBoundary)) {
                             body = body.replace(lastBoundary, "");
                         }
 
                         filesMap.put(name, body);
-                        System.out.println(filesMap);
                         break;
                     }
                 }
                 post.setFiles(filesMap);
-                System.out.println(post.getFiles());
             }
         }
     }

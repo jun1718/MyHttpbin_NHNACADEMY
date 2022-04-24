@@ -32,14 +32,9 @@ public class Sender {
         try {
             if (requestData.getPath().equals("/ip")) {
                 String ip = requestData.getOrigin().split("\n")[0];
-                json = "{\n" + "\t\"origin\" : " + ip + "\n}" + lineSeparator();
-            } else if (requestData.getPath().contains("/get")) {
-                json = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(requestData) + lineSeparator();
-            } else if (requestData.getPath().contains("/post")) {
-                json = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(requestData) + lineSeparator();
-
-                System.out.println(requestData);
-                System.out.println(json);
+                json = "{\n" + "\t\"origin\" : " + ip + "\n}" + "\r\n";
+            } else if (requestData.getPath().contains("/get") || requestData.getPath().contains("/post")) {
+                json = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(requestData) + "\r\n";
             } else {
                 json = "";
             }
@@ -53,14 +48,14 @@ public class Sender {
         int len = json.getBytes().length;
 
         try {
-            responseData.append("HTTP/1.1 200 OK" + lineSeparator())
-                    .append(getDate() + lineSeparator())
-                        .append("Content-Type: application/json" + lineSeparator())
-                            .append("Content-Length: " + len + lineSeparator())
-                                .append("Connection: keep-alive" + lineSeparator())
-                                    .append("Server: 11Jo" + lineSeparator())
-                                        .append("Access-Control-Allow-Origin: *" + lineSeparator())
-                                            .append("Access-Control-Allow-Credentials: true" + lineSeparator() + lineSeparator())
+            responseData.append("HTTP/1.1 200 OK" + "\r\n")
+                    .append(getDate() + "\r\n")
+                        .append("Content-Type: application/json" + "\r\n")
+                            .append("Content-Length: " + len + "\r\n")
+                                .append("Connection: keep-alive" + "\r\n")
+                                    .append("Server: 11Jo" + "\r\n")
+                                        .append("Access-Control-Allow-Origin: *" + "\r\n")
+                                            .append("Access-Control-Allow-Credentials: true" + "\r\n\r\n")
                                                 .append(json);
             out.writeBytes(responseData.toString());
         } catch (IOException e) {

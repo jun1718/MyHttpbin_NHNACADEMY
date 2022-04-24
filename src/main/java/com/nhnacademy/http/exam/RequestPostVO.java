@@ -10,9 +10,33 @@ public class RequestPostVO implements RequestVO {
     private Map<String, String> files = Collections.emptyMap();
     private Map<String, String> form = Collections.emptyMap();
     private Map<String, String> header = Collections.emptyMap();
-    private Map<String, String> json = Collections.emptyMap();
-    private String origin;
-    private String url;
+    private Map<String, String> json = null;
+    private String origin = "";
+    private String url = "";
+
+    public Map<String, String> getArgs() {
+        return args;
+    }
+
+    public String getData() {
+        return data;
+    }
+
+    public Map<String, String> getForm() {
+        return form;
+    }
+
+    public Map<String, String> getHeader() {
+        return header;
+    }
+
+    public Map<String, String> getJson() {
+        return json;
+    }
+
+    public String getUrl() {
+        return url;
+    }
 
     public void setFiles(Map<String, String> files) {
         this.files = files;
