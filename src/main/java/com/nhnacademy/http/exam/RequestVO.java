@@ -30,6 +30,4 @@ public interface RequestVO {
 
     void setJson(Map<String, String> map);
 
-    void setDispositionName(String dispositionName);
-    String getDispositionName();
 }

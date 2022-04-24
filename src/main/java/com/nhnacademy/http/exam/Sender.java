@@ -38,8 +38,6 @@ public class Sender {
             } else if (requestData.getPath().contains("/post")) {
                 json = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(requestData) + lineSeparator();
 
-                System.out.println(requestData);
-                System.out.println(json);
             } else {
                 json = "";
             }

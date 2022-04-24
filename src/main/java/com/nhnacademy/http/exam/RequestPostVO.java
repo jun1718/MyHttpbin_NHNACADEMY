@@ -15,23 +15,18 @@ public class RequestPostVO implements RequestVO {
     private String url;
 
     @JsonIgnore
-    private String dispositionName;
+    private String path;
+    @JsonIgnore
+    private String host;
+    @JsonIgnore
+    private String scheme;
 
-
-    public String getDispositionName() {
-        return dispositionName;
-    }
-
-    public void setDispositionName(String dispositionName) {
-        this.dispositionName = dispositionName;
+    public Map<String, String> getFiles() {
+        return files;
     }
 
     public void setFiles(Map<String, String> files) {
         this.files = files;
-    }
-
-    public Map<String, String> getFiles() {
-        return files;
     }
 
     public Map<String, String> getForm() {
@@ -42,45 +37,36 @@ public class RequestPostVO implements RequestVO {
         return json;
     }
 
-    public void setData(String data) {
-        this.data = data;
+    public void setJson(Map<String, String> json) {
+        this.json = json;
     }
 
     public String getData() {
         return data;
     }
 
-    public void setJson(Map<String, String> json) {
-        this.json = json;
-    }
-
-    @JsonIgnore
-    private String path;
-
-    @JsonIgnore
-    private String host;
-
-    @JsonIgnore
-    private String scheme;
-
-    public void setScheme(String scheme) {
-        this.scheme = scheme;
+    public void setData(String data) {
+        this.data = data;
     }
 
     public String getScheme() {
         return scheme;
     }
 
+    public void setScheme(String scheme) {
+        this.scheme = scheme;
+    }
+
     public String getPath() {
         return path;
     }
 
-    public String getHost() {
-        return host;
-    }
-
     public void setPath(String path) {
         this.path = path;
+    }
+
+    public String getHost() {
+        return host;
     }
 
     public void setHost(String host) {
