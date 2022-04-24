@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class Parser {
     private RequestVO requestVO;
@@ -13,7 +14,7 @@ public class Parser {
     private String[] metaDataHeader;
     private String metaDataBody;
     private String contentType;
-
+    private String boundary = "";
 
     public Parser(RequestVO requestVO, String requestData) {
         this.requestVO = requestVO;
@@ -22,7 +23,16 @@ public class Parser {
         metaData = requestData.split(System.lineSeparator() + System.lineSeparator());
         metaDataHeader = metaData[0].split(System.lineSeparator());
 
+        System.out.println("setContentType전 : \n" + requestData);
+        setContentType();
+        if (!boundary.isEmpty()) {
+            metaData = requestData.split(boundary + System.lineSeparator() + System.lineSeparator());
+
+        }
+        System.out.println("setContentType전 : \n" + requestData);
+
         if (metaDataHeader[0].split(" ")[0].equals("POST")) {
+            System.out.println("이거 ---------------\n" + Arrays.toString(metaData));
             metaDataBody = metaData[1];
         }
     }
@@ -43,6 +53,7 @@ public class Parser {
         for (int i = 1; i < metaDataHeader.length; i++) {
             String[] dividedHeader = metaDataHeader[i].split(": ");
             header.put(dividedHeader[0], dividedHeader[1]);
+            System.out.println(header);
             if (dividedHeader[0].equals("Host")) {
                 requestVO.setHost(dividedHeader[1]);
             }
@@ -71,7 +82,6 @@ public class Parser {
     }
 
     private void bodyParse() {
-        setContentType();
         RequestPostVO post = (RequestPostVO) requestVO;
         ObjectMapper mapper = new ObjectMapper();
         TypeReference<HashMap<String, String>> typeRef
@@ -87,13 +97,52 @@ public class Parser {
                 e.printStackTrace();
             }
         } else if (contentType.equals("multipart/form-data")) {
-            Map<String, Map<String, String>> files = new HashMap<>();
-            String str = "{ \"msg1\": \"hello\", \"msg2\": \"world\" }";
-            try {
-                files.put("upload", mapper.readValue(str, typeRef));
-                post.setFiles(files);
-            } catch (JsonProcessingException e) {
-                e.printStackTrace();
+            Map<String, String> filesMap = new HashMap<String, String>();
+            System.out.println("--------------------\n" + metaDataBody);
+            String[] files = metaDataBody.split( "--" + boundary + System.lineSeparator());
+            System.out.println("==========================\n" + Arrays.toString(files));
+
+            for (String file : files) {
+                String[] total = file.split(System.lineSeparator() + System.lineSeparator());
+                String header = total[0];
+                String[] headers = header.split(System.lineSeparator());
+
+                System.out.println(Arrays.toString(headers));
+                if (total.length <= 1) {
+                    continue;
+                }
+
+                String body = total[1];
+
+                for (String head : headers) {
+                    if (head.contains("Content-Disposition")) {
+                        String[] dispositionValues = head.split(" ");
+
+                        String name = Arrays.stream(dispositionValues)
+                            .filter(a -> a.contains("name"))
+                            .collect(Collectors.toList()).get(0).split("=\"")[1].replace("\";", "");
+
+                        System.out.println("name : " + name);
+
+
+//            Map<String, String> filesMap = new HashMap<String, String>();
+                        System.out.println("**************\n" + name + System.lineSeparator() + body);
+
+                        String lastBoundary = "--" + boundary + "--" + System.lineSeparator();
+                        if (body.contains(lastBoundary)) {
+                            body = body.replace(lastBoundary, "");
+                        }
+
+                        filesMap.put(name, body);
+                        System.out.println(filesMap);
+                        break;
+//                        requestVO.getFileHeader().put(Arrays.stream(head.split(System.lineSeparator() + System.lineSeparator())[0].split(System.lineSeparator()))
+//                            .filter(a -> a.contains("Content-Type"))
+//                            .collect(Collectors.toMap(a -> "contentType", a -> a.split(": ")[1])));
+                    }
+                }
+                post.setFiles(filesMap);
+                System.out.println(post.getFiles());
             }
         }
     }
@@ -103,6 +152,10 @@ public class Parser {
             if (metaDataHeader[i].contains("Content-Type")) {
                 contentType = metaDataHeader[i].split("; ")[0];
                 contentType = contentType.split(": ")[1];
+                if (contentType.equals("multipart/form-data")) {
+                    boundary = metaDataHeader[i].split("; ")[1].split("=")[1];
+                }
+                break;
             }
         }
     }

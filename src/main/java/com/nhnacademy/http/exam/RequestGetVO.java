@@ -77,6 +77,16 @@ public class RequestGetVO implements RequestVO{
 
     }
 
+    @Override
+    public void setDispositionName(String dispositionName) {
+
+    }
+
+    @Override
+    public String getDispositionName() {
+        return null;
+    }
+
     public Map<String, String> getHeader() {
         return header;
     }
