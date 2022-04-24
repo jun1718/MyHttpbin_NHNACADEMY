@@ -6,9 +6,7 @@ import java.net.Socket;
 
 public class Receiver {
     private final Socket socket;
-//    private final StringBuilder requestData = new StringBuilder();
     private String requestData;
-//    private RequestVO request;
     private final byte[] bytes = new byte[2048];
 
     public Receiver(Socket socket) {
@@ -28,8 +26,6 @@ public class Receiver {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        System.out.println(this.requestData);
     }
 
 

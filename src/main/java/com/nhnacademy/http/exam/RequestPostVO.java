@@ -14,18 +14,6 @@ public class RequestPostVO implements RequestVO {
     private String origin;
     private String url;
 
-    @JsonIgnore
-    private String dispositionName;
-
-
-    public String getDispositionName() {
-        return dispositionName;
-    }
-
-    public void setDispositionName(String dispositionName) {
-        this.dispositionName = dispositionName;
-    }
-
     public void setFiles(Map<String, String> files) {
         this.files = files;
     }
@@ -34,20 +22,8 @@ public class RequestPostVO implements RequestVO {
         return files;
     }
 
-    public Map<String, String> getForm() {
-        return form;
-    }
-
-    public Map<String, String> getJson() {
-        return json;
-    }
-
     public void setData(String data) {
         this.data = data;
-    }
-
-    public String getData() {
-        return data;
     }
 
     public void setJson(Map<String, String> json) {
@@ -95,24 +71,12 @@ public class RequestPostVO implements RequestVO {
         this.origin = origin;
     }
 
-    public String getUrl() {
-        return url;
-    }
-
     public void setUrl(String url) {
         this.url = url;
     }
 
-    public Map<String, String> getArgs() {
-        return args;
-    }
-
     public void setArgs(Map<String, String> args) {
         this.args = args;
-    }
-
-    public Map<String, String> getHeader() {
-        return header;
     }
 
     public void setHeader(Map<String, String> header) {

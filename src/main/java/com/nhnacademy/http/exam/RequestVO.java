@@ -29,7 +29,4 @@ public interface RequestVO {
     void setData(String metaDatum);
 
     void setJson(Map<String, String> map);
-
-    void setDispositionName(String dispositionName);
-    String getDispositionName();
 }

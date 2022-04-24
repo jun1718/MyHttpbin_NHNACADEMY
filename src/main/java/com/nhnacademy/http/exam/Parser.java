@@ -10,38 +10,34 @@ import java.util.stream.Collectors;
 
 public class Parser {
     private RequestVO requestVO;
-    private String[] metaData;
+    private String[] metaData = {};
     private String[] metaDataHeader;
     private String metaDataBody;
     private String contentType;
     private String boundary = "";
+    private String method = "";
 
     public Parser(RequestVO requestVO, String requestData) {
         this.requestVO = requestVO;
-//        metaData = requestData.split(System.lineSeparator());
 
         metaData = requestData.split(System.lineSeparator() + System.lineSeparator());
         metaDataHeader = metaData[0].split(System.lineSeparator());
 
-        System.out.println("setContentType전 : \n" + requestData);
         setContentType();
         if (!boundary.isEmpty()) {
             metaData = requestData.split(boundary + System.lineSeparator() + System.lineSeparator());
-
         }
-        System.out.println("setContentType전 : \n" + requestData);
 
-        if (metaDataHeader[0].split(" ")[0].equals("POST")) {
-            System.out.println("이거 ---------------\n" + Arrays.toString(metaData));
+        this.method = metaDataHeader[0].split(" ")[0];
+        if (this.method.equals("POST")) {
             metaDataBody = metaData[1];
         }
     }
 
-    public void parse() {
+    public void parse() { // FIXME: url까지 헤더파서에서 다 집어넣도록하자
         headerParse();
-        requestVO.setUrl(requestVO.getScheme().toLowerCase() + "://" + requestVO.getHost() + requestVO.getPath());
 
-        if (metaDataHeader[0].split(" ")[0].equals("POST")) {
+        if (this.method.equals("POST")) {
             bodyParse();
         }
     }
@@ -53,13 +49,13 @@ public class Parser {
         for (int i = 1; i < metaDataHeader.length; i++) {
             String[] dividedHeader = metaDataHeader[i].split(": ");
             header.put(dividedHeader[0], dividedHeader[1]);
-            System.out.println(header);
             if (dividedHeader[0].equals("Host")) {
                 requestVO.setHost(dividedHeader[1]);
             }
         }
 
         requestVO.setHeader(header);
+        requestVO.setUrl(requestVO.getScheme().toLowerCase() + "://" + requestVO.getHost() + requestVO.getPath());
     }
 
     private void parseStartLine() {
@@ -68,7 +64,7 @@ public class Parser {
         requestVO.setScheme(startLine[2].split("/")[0]);
         Map<String, String> map = new HashMap<>();
 
-        if (startLine[1].contains("?")) {
+        if (requestVO.getPath().contains("?")) {
             String[] parameters = startLine[1].split("\\?");
             String[] nParamter = parameters[1].split("&");
 
@@ -98,9 +94,11 @@ public class Parser {
             }
         } else if (contentType.equals("multipart/form-data")) {
             Map<String, String> filesMap = new HashMap<String, String>();
-            System.out.println("--------------------\n" + metaDataBody);
+
+            System.out.println(metaDataBody);
+
             String[] files = metaDataBody.split( "--" + boundary + System.lineSeparator());
-            System.out.println("==========================\n" + Arrays.toString(files));
+
 
             for (String file : files) {
                 String[] total = file.split(System.lineSeparator() + System.lineSeparator());
@@ -122,11 +120,6 @@ public class Parser {
                             .filter(a -> a.contains("name"))
                             .collect(Collectors.toList()).get(0).split("=\"")[1].replace("\";", "");
 
-                        System.out.println("name : " + name);
-
-
-//            Map<String, String> filesMap = new HashMap<String, String>();
-                        System.out.println("**************\n" + name + System.lineSeparator() + body);
 
                         String lastBoundary = "--" + boundary + "--" + System.lineSeparator();
                         if (body.contains(lastBoundary)) {
