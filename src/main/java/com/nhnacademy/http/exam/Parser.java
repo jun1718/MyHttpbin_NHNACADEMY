@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 
 public class Parser {
     private RequestVO requestVO;
-    private String[] metaData = {};
+    private String[] metaData;
     private String[] metaDataHeader;
     private String metaDataBody;
     private String contentType;
@@ -24,7 +24,7 @@ public class Parser {
         metaDataHeader = metaData[0].split(System.lineSeparator());
 
         setContentType();
-        if (!boundary.isEmpty()) {
+        if (!boundary.isEmpty() && metaData.length >= 2) {
             metaData = requestData.split(boundary + System.lineSeparator() + System.lineSeparator());
         }
 

@@ -7,7 +7,7 @@ import java.net.Socket;
 public class Receiver {
     private final Socket socket;
     private String requestData;
-    private final byte[] bytes = new byte[2048];
+    private final byte[] bytes = new byte[4096];
 
     public Receiver(Socket socket) {
         this.socket = socket;
