@@ -28,7 +28,6 @@ public class Receiver {
         }
     }
 
-
     public String getRequestData() {
         return requestData;
     }

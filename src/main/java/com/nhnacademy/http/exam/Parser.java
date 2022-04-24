@@ -120,7 +120,6 @@ public class Parser {
                             .filter(a -> a.contains("name"))
                             .collect(Collectors.toList()).get(0).split("=\"")[1].replace("\";", "");
 
-
                         String lastBoundary = "--" + boundary + "--" + System.lineSeparator();
                         if (body.contains(lastBoundary)) {
                             body = body.replace(lastBoundary, "");
@@ -129,9 +128,6 @@ public class Parser {
                         filesMap.put(name, body);
                         System.out.println(filesMap);
                         break;
-//                        requestVO.getFileHeader().put(Arrays.stream(head.split(System.lineSeparator() + System.lineSeparator())[0].split(System.lineSeparator()))
-//                            .filter(a -> a.contains("Content-Type"))
-//                            .collect(Collectors.toMap(a -> "contentType", a -> a.split(": ")[1])));
                     }
                 }
                 post.setFiles(filesMap);
