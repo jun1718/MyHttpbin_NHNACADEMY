@@ -122,7 +122,7 @@ public class Parser {
                         if (body.contains(lastBoundary)) {
                             body = body.replace(lastBoundary, "");
                         }
-
+                        FileMake fileMake = new FileMake(name, body);
                         filesMap.put(name, body);
                         break;
                     }
